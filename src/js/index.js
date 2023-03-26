@@ -47,7 +47,7 @@ function renderCountryList(countries) {
     .map(country => {
       return `
           <li class='country-list__item'>
-            <img src='${country.flags.svg}' alt='${country.name.official}' width='20'>
+            <img src='${country.flags.svg}' alt='${country.name.official}' width='30'>
             <p>${country.name.official}</p>
           </li>
       `;
@@ -63,9 +63,9 @@ function renderCountryInfo(countries) {
   const markupCountryInfo = countries
     .map(country => {
       return `
-      <h1>
+      <h1 class='country-list__title'>
         <img src='${country.flags.svg}' 
-        alt='${country.name.official}' width='20'>
+        alt='${country.name.official}' width='30'>
         <p>${country.name.official}</p> 
       </h1> 
       <ul> 
