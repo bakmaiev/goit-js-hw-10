@@ -2,6 +2,8 @@ import Notiflix from 'notiflix';
 import debounce from 'lodash.debounce';
 import '../css/styles.css';
 import { fetchCountries } from './fetchCountries';
+import { renderCountryInfo } from './createMarkup';
+import { renderCountryList } from './createMarkup';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -14,20 +16,26 @@ const handleSearchCountryOnInput = e => {
   const seekedCountry = e.target.value.trim();
 
   if (!seekedCountry) {
-    counrtyListEl.innerHTML = '';
-    countryInfoEl.innerHTML = '';
+    resetList();
     return;
   }
 
   fetchCountries(seekedCountry)
     .then(data => {
       if (data.length > 10) {
+        resetList();
         Notiflix.Notify.info(
           'Too many matches found. Please enter a more specific name.'
         );
       } else if (data.length > 1) {
-        renderCountryList(data);
-      } else renderCountryInfo(data);
+        resetList();
+        const markupCountryList = renderCountryList(data);
+        counrtyListEl.innerHTML = markupCountryList;
+      } else {
+        resetList();
+        const markupCountryInfo = renderCountryInfo(data);
+        countryInfoEl.innerHTML = markupCountryInfo;
+      }
     })
     .catch(err => {
       Notiflix.Notify.failure('Oops, there is no country with that name');
@@ -40,44 +48,7 @@ inputEl.addEventListener(
   debounce(handleSearchCountryOnInput, DEBOUNCE_DELAY)
 );
 
-function renderCountryList(countries) {
-  countryInfoEl.innerHTML = '';
-
-  const markupCountryList = countries
-    .map(country => {
-      return `
-          <li class='country-list__item'>
-            <img src='${country.flags.svg}' alt='${country.name.official}' width='30'>
-            <p>${country.name.official}</p>
-          </li>
-      `;
-    })
-    .join('');
-
-  counrtyListEl.innerHTML = markupCountryList;
-}
-
-function renderCountryInfo(countries) {
+function resetList() {
   counrtyListEl.innerHTML = '';
-
-  const markupCountryInfo = countries
-    .map(country => {
-      return `
-      <h1 class='country-list__title'>
-        <img src='${country.flags.svg}' 
-        alt='${country.name.official}' width='30'>
-        <p>${country.name.official}</p> 
-      </h1> 
-      <ul> 
-        <li class='country-list__item'>Capital: ${country.capital}</li> 
-        <li class='country-list__item'>Population: ${country.population}</li> 
-        <li class='country-list__item'>Languages: ${Object.values(
-          country.languages
-        )}</li> 
-      </ul>
-      `;
-    })
-    .join('');
-
-  countryInfoEl.innerHTML = markupCountryInfo;
+  countryInfoEl.innerHTML = '';
 }
